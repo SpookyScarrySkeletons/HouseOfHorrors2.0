@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cutscene : MonoBehaviour {
+public class Cutscene : MonoBehaviour
+{
 
 	UnityStandardAssets.Characters.FirstPerson.FirstPersonController controller;
 	public GameObject character;
@@ -10,14 +11,16 @@ public class Cutscene : MonoBehaviour {
 	public Camera deathCam;
 	float speed = 5;
 	bool active;
+	public Light myLight;
 
-
-	void Start () {
+	void Start ()
+	{
 		controller = GetComponent<UnityStandardAssets.Characters.FirstPerson.FirstPersonController> ();
 
 	}
 
-	IEnumerator HitCam(){
+	IEnumerator HitCam ()
+	{
 		yield return new WaitForSeconds (.867f);
 		active = false;
 		Camera.main.gameObject.SetActive (false);
@@ -27,21 +30,26 @@ public class Cutscene : MonoBehaviour {
 	
 	}
 
-	public void Attacked (){
+	public void Attacked ()
+	{
+		print ("rawr XD");
 		controller.enabled = false;
 		active = true;
 		StartCoroutine (HitCam ());
 	}
 
-	void Look(Vector3 target){
+	void Look (Vector3 target)
+	{
+		myLight.spotAngle = 90;
 		Vector3 targetDir = target - (transform.position + new Vector3 (0, .5f));
 		//targetDir.y = 0.0f;
 		transform.rotation = Quaternion.RotateTowards (transform.rotation, Quaternion.LookRotation (targetDir), Time.time * speed);
 	}
 
-	void Update(){
+	void Update ()
+	{
 		if (active) {
-			Look (monster.transform.position + (new Vector3(0,1.5f,0)) );
+			Look (monster.transform.position + (new Vector3 (0, 1.5f, 0)));
 		}
 	}
 

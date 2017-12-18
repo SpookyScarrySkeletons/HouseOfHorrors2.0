@@ -11,8 +11,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
     public class FirstPersonController : MonoBehaviour
     {
         [SerializeField] private bool m_IsWalking;
+		[SerializeField] public bool m_IsCrouching;
+		public bool IsUnderDesk;
         [SerializeField] private float m_WalkSpeed;
         [SerializeField] private float m_RunSpeed;
+		[SerializeField] private float m_CrouchSpeed;
         [SerializeField] [Range(0f, 1f)] private float m_RunstepLenghten;
         [SerializeField] private float m_JumpSpeed;
         [SerializeField] private float m_StickToGroundForce;
@@ -41,6 +44,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float m_NextStep;
         private bool m_Jumping;
         private AudioSource m_AudioSource;
+		private float m_CrouchVelocity;
+		private float m_CrouchY;
 
         // Use this for initialization
         private void Start()
@@ -113,7 +118,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_MoveDir.y = -m_StickToGroundForce;
 
-                if (m_Jump)
+				if (m_Jump & !m_IsCrouching)
                 {
                     m_MoveDir.y = m_JumpSpeed;
                     PlayJumpSound();
@@ -178,7 +183,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
 
         private void UpdateCameraPosition(float speed)
-        {
+        {	
+			
             Vector3 newCameraPosition;
             if (!m_UseHeadBob)
             {
@@ -197,7 +203,21 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 newCameraPosition = m_Camera.transform.localPosition;
                 newCameraPosition.y = m_OriginalCameraPosition.y - m_JumpBob.Offset();
             }
-            m_Camera.transform.localPosition = newCameraPosition;
+
+
+
+			if (m_IsCrouching) {
+				m_CharacterController.height = .2f;
+				m_CrouchY = Mathf.SmoothDamp (m_CrouchY, -.4f, ref m_CrouchVelocity, .1f);
+			}else {
+				m_CharacterController.height = 1.8f;
+				m_CrouchY = Mathf.SmoothDamp (m_CrouchY, 0, ref m_CrouchVelocity, .1f);
+			
+			}
+				
+			m_Camera.transform.localPosition = newCameraPosition + m_CrouchY * Vector3.up;
+
+
         }
 
 
@@ -212,10 +232,25 @@ namespace UnityStandardAssets.Characters.FirstPerson
 #if !MOBILE_INPUT
             // On standalone builds, walk/run speed is modified by a key press.
             // keep track of whether or not the character is walking or running
-            m_IsWalking = !Input.GetKey(KeyCode.LeftShift);
+
+
+			m_IsCrouching = Input.GetKey(KeyCode.C);
+			if (Physics.SphereCast(new Ray(transform.position, Vector3.up), m_CharacterController.radius, 1.35f)){
+				m_IsCrouching = true;
+				IsUnderDesk = true;
+			}else{
+				IsUnderDesk = false;
+			}
+
+			m_IsWalking = true;
+			if (!m_IsCrouching){
+				m_IsWalking = !Input.GetKey(KeyCode.LeftShift);
+			}
+            
 #endif
             // set the desired speed to be walking or running
             speed = m_IsWalking ? m_WalkSpeed : m_RunSpeed;
+			speed = m_IsCrouching ? m_CrouchSpeed : speed;
             m_Input = new Vector2(horizontal, vertical);
 
             // normalize input if it exceeds 1 in combined length:
