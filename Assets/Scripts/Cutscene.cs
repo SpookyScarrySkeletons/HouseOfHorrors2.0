@@ -41,17 +41,27 @@ public class Cutscene : MonoBehaviour
 
 	void Look (Vector3 target)
 	{
-		
+
 		Vector3 targetDir = target - (transform.position + new Vector3 (0, .1f));
 		//targetDir.y = 0.0f;
 		transform.rotation = Quaternion.RotateTowards (transform.rotation, Quaternion.LookRotation (targetDir), Time.time * speed);
+
 	}
+
+	//	void Move (Vector3 target)
+	//	{
+	//		float x = transform.position.x;
+	//		float z = transform.position.z;
+	//		transform.position = new Vector3 (x, 0.5f, z);
+	//
+	//	}
 
 	void Update ()
 	{
 		if (active) {
-			Look (monster.transform.position + (new Vector3 (0, 1.5f, 0)));
+			Look (monster.transform.position + (new Vector3 (0, 1f, 0)));
+			//Move ((new Vector3 (0, -4.3f, 0)));
 		}
 	}
-
+	//Fucking do something about this conner
 }
