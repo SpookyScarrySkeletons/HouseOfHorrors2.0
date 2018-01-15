@@ -92,13 +92,6 @@ public class ZombieController : MonoBehaviour {
 		}
 
 		attacking = false;
-		CapsuleCollider capCollider = GetComponent<CapsuleCollider> ();
-		float rad = capCollider.radius;
-		capCollider.isTrigger = false;
-		capCollider.radius = 0;
-		yield return new WaitForSeconds (.5f);
-		capCollider.radius = rad;
-		capCollider.isTrigger = true;
 	}
 
 	// When theres a collision run this
@@ -110,13 +103,12 @@ public class ZombieController : MonoBehaviour {
 			print (hit.transform);
 		
 
-			if (hit.transform == player.transform) {
+			if (hit.transform.CompareTag("Player")) {
 				print ("OK PLZ RUN");
 				attacking = true;
 				transform.LookAt (target);
 				touchedTime = Time.time + 2.63f;
 				anim.SetTrigger (playerController.IsUnderDesk ? "isAttacking" : "isAttacking");
-				anim.SetTrigger ("isAttacking");
 				StartCoroutine (Attack ());
 			}// Check tag to see if it can attack
 			
@@ -133,10 +125,10 @@ public class ZombieController : MonoBehaviour {
 		int layerMask = 1 << LayerMask.NameToLayer("Monster");
 		if (Physics.Linecast(transform.position, player.transform.position, out hit, ~layerMask)){
 			//print (hit.transform);
-			if (hit.transform == player.transform && alive && !(playerController.IsUnderDesk && !inSight)) {
+			if (hit.transform.CompareTag("Player") && alive && !(playerController.IsUnderDesk && !inSight)) {
 				goTo = player.transform.position;
 				inSight = true;
-			}else if(inSight && hit.transform != player.transform)  {
+			}else if(inSight && !hit.transform.CompareTag("Player"))  {
 				inSight = false;
 				goTo = player.transform.position;
 
