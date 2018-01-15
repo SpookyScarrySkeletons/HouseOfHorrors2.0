@@ -19,7 +19,7 @@ public class Interact : MonoBehaviour
 	void Update ()
 	{
 		if (Vector3.Distance (transform.position, monster.position) <= minUsed && ranOnce == false) {
-			anim.SetBool ("isOpen", !anim.GetBool ("isOpen"));
+			anim.SetBool ("isOpen", true);
 			ranOnce = true;
 		}
 
